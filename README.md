@@ -1,5 +1,5 @@
-#Advent of code 2020
-##Diarmaid Ó Braonáin
+#Advent of code 2020#
+##Diarmaid Ó Braonáin##
 
 To run any day cd into the folder "DayX" and then run "python dayX.py input.txt"
 
