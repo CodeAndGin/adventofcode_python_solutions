@@ -4,107 +4,147 @@ with open(sys.argv[1], "r") as ifile:
     inp = ifile.read().split("\n")
     inp.pop()
 
+test = ["L.LL.LL.LL",
+        "LLLLLLL.LL",
+        "L.L.L..L..",
+        "LLLL.LL.LL",
+        "L.LL.LL.LL",
+        "L.LLLLL.LL",
+        "..L.L.....",
+        "LLLLLLLLLL",
+        "L.LLLLLL.L",
+        "L.LLLLL.LL"]
 
-def changeSeats(new, old):
+def changeSeats(old):
+    new = []
     for i, line in enumerate(old):
         new.append("")
         for j, space in enumerate(line):
-            up = i-1
-            down = i+1
-            left = j-1
-            right = j+1
-
             if space == "L":
-                if left == -1:
-                    nw, w, sw = True, True, True
-                if up == -1:
-                    nw, n, ne = True, True, True
-                if down == len(old):
-                    sw, s, se = True, True, True
-                if right == len(line):
-                    ne, e, se = True, True, True
-                if 'nw' not in locals():
-                    nw = old[up][left] == "L" or old[up][left] == "."
-                if 'n' not in locals():
-                    n = old[up][i] == "L" or old[up][i] == "."
-                if 'ne' not in locals():
-                    ne = old[up][right] == "L" or old[up][right] == "."
-                if 'e' not in locals():
-                    e = old[i][right] == "L" or old[i][right] == "."
-                if 'se' not in locals():
-                    se = old[down][right] == "L" or old[i][right] == "." 
-                if 's' not in locals():
-                    s = old[down][i] == "L" or old[down][i] == "."
-                if 'sw' not in locals():
-                    sw = old[down][left] == "L" or old[down][left] == "."
-                if 'w' not in locals():
-                    w = old[i][left] == "L" or old[i][left] == "." 
+                changes = True
+                for a in range(i-1,i+2):
+                    for b in range(j-1,j+2):
+                        if b==j and i==a: continue
+                        if a < 0: continue
+                        if b < 0: continue
+                        if a > len(old) - 1: continue
+                        if b > len(line) - 1: continue
 
-                if nw and n and ne and e and se and s and sw and w:
-                    new[i] += "#"
+                        if old[a][b] == "#":
+                            changes = False
+
+                if changes:
+                    new[i]+="#"
                 else:
-                    new[i] += "L"
+                    new[i]+="L"
 
             if space == ".":
                 new[i] += "."
 
             if space == "#":
-                if left == -1:
-                    nw, w, sw = 0,0,0
-                if up == -1:
-                    nw, n, ne = 0,0,0
-                if down == len(old):
-                    sw, s, se = 0,0,0
-                if right == len(line):
-                    ne, e, se = 0,0,0
-                if 'nw' not in locals():
-                    nw = 1 if old[up][left] == "#" else 0
-                if 'n' not in locals():
-                    n = 1 if old[up][i] == "#" else 0
-                if 'ne' not in locals():
-                    ne = 1 if old[up][right] == "#" else 0
-                if 'e' not in locals():
-                    e = 1 if old[i][right] == "#" else 0
-                if 'se' not in locals():
-                    se = 1 if old[down][right] == "#" else 0
-                if 's' not in locals():
-                    s = 1 if old[down][i] == "#" else 0
-                if 'sw' not in locals():
-                    sw = 1 if old[down][left] == "#" else 0
-                if 'w' not in locals():
-                    w = 1 if old[i][left] == "#" else 0
-                if nw + n + ne + e + se + s + sw + w >= 4:
+                count = 0
+                for a in range (i-1,i+2):
+                    for b in range (j-1,j+2):
+                        if b==j and a==i: continue
+                        if a<0: continue
+                        if b<0: continue
+                        if a>len(old)-1: continue
+                        if b>len(line)-1: continue
+
+                        if old[a][b] == "#":
+                            count+=1
+                if count >= 4:
                     new[i]+="L"
                 else:
                     new[i]+="#"
+                
 
-            if 'nw' in locals():
-                del nw
-            if 'n' in locals():
-                del n
-            if 'ne' in locals():
-                del ne
-            if 'e' in locals():
-                del e
-            if 'se' in locals():
-                del se
-            if 's' in locals():
-                del s
-            if 'sw' in locals():
-                del sw
-            if 'w' in locals():
-                del w
     
-    for i,k in enumerate(old):
-        for j,l in enumerate(k):
-            if old[i][j] != new[i][j]:
-                return changeSeats([], new)
+    #for i,k in enumerate(old):
+        #for j,l in enumerate(k):
+            #if old[i][j] != new[i][j]:
+                #return changeSeats(new)
     
     return new
 
-#print(inp)
-print(changeSeats([],inp))
+def changeSeatsLineOfSight(old):
+    print(old)
+    new = []
+    for i, line in enumerate(old):
+        new.append("")
+        #print(old[i])
+        #print(len(line))
+        for j, space in enumerate(line):
+
+            if space == ".":
+                new[i]+="."
+                continue
+
+            seen = []
+
+            for a in range (i-1,i+2):
+                for b in range (j-1,j+2):
+                    if b==j and a==i: continue
+                    if a<0: continue
+                    if b<0: continue
+                    if a>len(old)-1: continue
+                    if b>len(old[i])-1: continue
+                    x = a
+                    y = b
+                    #print(a, b, len(old),len(line))
+                    see = old[x][y]
+                    while see == ".":
+                        if x-1 < 0: break
+                        if x+1 >= len(old): break
+                        if y-1 < 0: break
+                        if y+1 >= len(line): break
+                        if a == i-1: x-=1
+                        if b == j-1: y-=1
+                        if a == i+1: x+=1
+                        if b == j+1: y+=1
+                        if a == i: x = a
+                        if b == j: y = b 
+                        see = old[x][y] #need safeguards
+                    seen.append(see)
+            #print(seen)
+            if space == "L" and seen.count("#") == 0:
+                new[i] += "#"
+            elif space == "#" and seen.count("#") >=5:
+                new[i] += "L"
+            else:
+                new[i] += "#"
+
+    if old == new:
+        return new
+    else:
+        return changeSeatsLineOfSight(new)
+
+
+
+prev = inp.copy()
+
+new = []
 count = 0
-for line in changeSeats([], inp):
-    count+=line.count("#")
+new = changeSeatsLineOfSight(test)
+for i in new:
+    count+= i.count("#")
+print (count)
+while True:
+    new = changeSeats(prev).copy()
+    if new == prev:
+        break
+    #for i in new:
+        #print(i)
+    prev = new.copy()
+
+
+#new = changeSeats(inp)
+#for i in new:
+#    print(i)
+
+count = 0
+for i in new:
+    count+=i.count("#")
+
 print(count)
+
